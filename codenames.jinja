@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta http-equiv="cache-control" content="max-age=0" />
+        <meta http-equiv="cache-control" content="no-cache"/>
+        <meta http-equiv="expires" content="0"/>
+        <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT"/>
+        <meta http-equiv="pragma" content="no-cache"/>
+        <script src="http://vg.com/assets/scripts/adobe_scripts/js/jquery-1.9.1.min.js"></script>
+        <style>
+        @import url(http://fonts.googleapis.com/css?family=Gudea:400,700);
+        @import url(https://fonts.googleapis.com/earlyaccess/notosanstc.css);
+        @import url("https://fonts.googleapis.com/css?family=Roboto");
+        body {
+        -webkit-perspective: 800px;
+        perspective: 800px;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+        font-family: Noto Sans TC;
+        background: black;
+        /*background: -webkit-linear-gradient(315deg, #EA5C54 0%, #bb6dec 100%);*/
+        }
+
+        .main {
+            text-align: center;
+        }
+        .title {
+        color: #afb1be;
+        font-size: 6em;
+        }
+
+        body .card {
+        opacity: 1;
+        transition-property: transform,opacity,box-shadow,top,left,-webkit-transform;
+        transition-duration: .5s;
+        transform-origin: 161px 100%;
+        transform: rotateX(0deg);
+        width: 180px;
+        border-top: 2px solid #D8312A;
+        height: 120px;
+        position: relative;
+        display: in left: 0;
+        right: 0;
+        margin: auto;
+        top: 0;
+        bottom: 0;
+        padding: 20px 20px 20px 20px;
+        display: inline-block;
+        border: 4px solid #dcae61;
+        border-radius: 25px;
+        margin: 5px 5px 5px 5px;
+        overflow: hidden;
+        background: linear-gradient(45deg, #35394a 0%, #1f222e 100%);
+
+        }
+
+        body .card:hover{
+        -webkit-animation: neon2 1.5s ease-in-out infinite alternate;
+        border: 4px solid #fff;
+        }
+        body .card_grid {
+        width: 1210px;
+        margin: auto;
+        }
+        body .card_title {
+        color: #afb1be;
+        height: 40px;
+        text-align: left;
+        font-size: 26px;
+        }
+
+        .card img {
+            filter: grayscale(1) contrast(2);
+        }
+
+        .face {
+            width: 105%;
+            position: absolute;
+            height: 105%;
+            top: -5px;
+            left: -5px;
+        }
+
+        .overlay_group{
+            filter: saturate(1.3) contrast(1.3);
+        }
+
+        .overlay {
+            width: 105%;
+            position: absolute;
+            height: 105%;
+            top: -5px;
+            left: -5px;
+            z-index: 1;
+            opacity: .85;
+            box-shadow: inset 0 0 5em #000;         
+        }        
+        .overlay_yellow {
+            background: #efd988;
+        }
+        .overlay_red {
+            background: #bf5555;
+        }      
+        .overlay_blue {
+            background: #4d89bd;
+        }          
+        .overlay_black {
+            background: black;
+            opacity: 0.5;
+        }            
+        .overlay_black:before {
+            content: 'x';
+            font-size: 100px;
+            width: 105%;
+            color: white;
+            display: block;
+        }                  
+
+        .off {
+            display: none;
+        }
+
+        .on {
+            display: inline;
+        }
+        .lang{
+            color: white;
+        }
+
+
+        @-webkit-keyframes neon2 {
+        from {
+        box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #228DFF, 0 0 70px #228DFF, 0 0 80px #228DFF, 0 0 100px #228DFF, 0 0 150px #228DFF;
+        }
+        to {
+        box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #228DFF, 0 0 35px #228DFF, 0 0 40px #228DFF, 0 0 50px #228DFF, 0 0 75px #228DFF;
+        }
+        }
+        </style>
+    </head>
+    <body>
+        <div class='main'>
+            <div class="title">{{title}}</div>
+            <div class='card_grid'>
+                {% for codename in codenames %}
+                    <div class='card' id='{{codename.count}}'>
+                        <div class='overlay_group off'>
+                            <div class='overlay'></div>
+                            <img src='../codenames/photos/{{codename.image_id}}.png' class='face'>
+                        </div>
+                        <div class='card_title english' style="display:none">
+                            <span>{{codename.english}}</span>
+                        </div>
+                        <div class='card_title chinese'>
+                            <span>{{codename.chinese}}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="lang lang_chinese">{{chinese}}</div>
+            <div class="lang lang_english">English</div>
+        </div>
+        <script>
+            $( ".card" ).on( "click", function() {
+                thiscard = $(this);
+                jQuery.ajax({
+                    url: "http://" + document.domain + "/get_allegiance?card_id=" + $(this).attr("id"),
+                    type: "GET",
+                    contentType: 'application/text; charset=utf-8',
+                    success: function(resultData) {
+                        if(resultData == "0"){
+                            $(thiscard).find('.overlay_group').removeClass('off');
+                            $(thiscard).find('.overlay_group').addClass('on');
+                            $(thiscard).find('div.overlay').addClass('on overlay_red');                     
+
+                        }
+                        else if(resultData == '1'){
+                            $(thiscard).find('.overlay_group').removeClass('off');
+                            $(thiscard).find('.overlay_group').addClass('on');
+                            $(thiscard).find('div.overlay').removeClass('off');
+                            $(thiscard).find('div.overlay').addClass('on overlay_blue');   
+                        }
+                        else if(resultData == '2'){
+                            $(thiscard).find('.overlay_group').removeClass('off');
+                            $(thiscard).find('.overlay_group').addClass('on');
+                            $(thiscard).find('div.overlay').removeClass('off');
+                            $(thiscard).find('div.overlay').addClass('on overlay_yellow');                              
+                        }
+                        else if(resultData == '3'){
+                            $(thiscard).find('.overlay_group').removeClass('off');
+                            $(thiscard).find('.overlay_group').addClass('on');
+                            $(thiscard).find('div.overlay').removeClass('off');
+                            $(thiscard).find('div.overlay').addClass('on overlay_black');   
+                        }
+                    },
+                    error : function(jqXHR, textStatus, errorThrown) {
+                    },
+                    timeout: 120000,
+                });
+            });
+            $( "div.lang_chinese" ).on( "click", function() {
+                $("div.english").css("display", "none");
+                $("div.chinese").css("display", "block");
+            });
+            $( "div.lang_english" ).on( "click", function() {
+                $("div.chinese").css("display", "none");
+                $("div.english").css("display", "block");                
+            });            
+
+        </script>
+
+    </body>
+</html>
