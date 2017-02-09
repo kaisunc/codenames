@@ -17,47 +17,46 @@ import hug
 sys.path.append("c:/Apache24/codenames")
 board_game_path = "c:/Apache24/codenames"
 
-def get_type():
-    global rcount, bcount, ccount, acount
-    at = 0
-    idx = random.randrange(1,26)
-    if idx > 0 and idx < 10 and rcount < 9:
-        rcount += 1
-        at = 0
-    elif idx > 9 and idx < 18 and bcount < 8:
-        bcount += 1
-        at = 1
-    elif idx > 17 and idx < 25 and ccount < 7:
-        ccount += 1
-        at = 2
-    elif idx > 24 and idx < 26 and acount != 1:
-        acount += 1
-        at = 3
-    else:
-        pass
-    counts = [rcount, bcount, ccount, acount]
-    return [at, counts, sum(counts)]
-
-def codename_allegiance():
-    allegiance_types = ['red','blue','civilian','assassin']
-    global rcount, bcount, ccount, acount
-    allegiance = []
-    prev = 0
-    t = []
-    while sum(t) != 25:
-        idx, t, countsum = get_type()
-        if countsum == prev:
+#%%
+def fill_board(maxrange, color):
+    global used, allegiance
+    if color == 'red':
+        color = 0
+    elif color == 'blue':
+        color = 1
+    elif color == 'yellow':
+        color = 2
+    elif color == 'black':
+        color = 3
+    
+    color_location = []
+    while len(color_location) < maxrange and len(used) < 25:
+        idx = random.randrange(0,25)
+        if idx in used:
             pass
         else:
-            allegiance.append(idx)
-            prev += 1
+            used.append(idx)
+            allegiance[idx] = color
+            color_location.append(idx)
+
+allegiance = []
+used = []
+def codename_allegiance():
+    global allegiance
+    global used
+    allegiance = []
+    used = []
+    for x in range(0,25):
+        allegiance.append(0)
+    fill_board(1, 'black')
+    fill_board(9, 'red')
+    fill_board(8, 'blue')
+    fill_board(7, 'yellow')
     return allegiance
 
+
 #%%
-rcount = 0
-bcount = 0
-ccount = 0
-acount = 0
+
 @hug.get(output=hug.output_format.html)
 @hug.http()
 def codename():
@@ -82,7 +81,7 @@ def codename():
         pickle.dump(t, f)
     count = 1
     while len(codenames) != 25:
-        idx = random.randrange(0, 400)
+        idx = random.randrange(0, len(codenames_all))
         if idx in existing:
             pass
         else:
